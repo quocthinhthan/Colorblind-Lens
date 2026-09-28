@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D-15 Vision Lens | Mô phỏng sắc giác theo dữ liệu kiểm tra Farnsworth D-15</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfeff',
+              100: '#cffafe',
+              400: '#22d3ee',
+              500: '#06b6d4',
+              600: '#0891b2',
+              700: '#0e7490',
+            },
+            surface: {
+              950: '#070b14',
+              900: '#0d1322',
+              850: '#11192e',
+              800: '#17223b',
+              700: '#1f2e4d',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Custom scrollbar and aesthetics */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d1322;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f2e4d;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0891b2;
+    }
+    .glass-card {
+      background: rgba(13, 19, 34, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(34, 211, 238, 0.3);
+      box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.15);
+      transform: translateY(-2px);
+    }
+    .slider-handle {
+      box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.3), 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #17223b;
+      border-radius: 9999px;
+      height: 6px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #22d3ee;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+      border: 2px solid #0d1322;
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    .color-swatch-ring {
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-surface-950 text-slate-100 font-sans min-h-screen selection:bg-brand-500 selection:text-black">
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-surface-800 bg-surface-900/90 sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-rose-500 p-0.5 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+          <div class="w-full h-full bg-surface-950 rounded-[10px] flex items-center justify-center">
+            <svg class="w-6 h-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              D-15 Vision Lens
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500/30 text-cyan-300">LMS Machado 2009</span>
+            </h1>
+          </div>
+          <p class="text-xs text-slate-400">Mô phỏng thế giới qua đôi mắt khiếm khuyết sắc giác thực tế</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center bg-surface-850 p-1 rounded-xl border border-surface-700/60 shadow-inner">
+        <button id="nav-tab-palette" onclick="switchTab('palette')" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 text-cyan-400 bg-surface-700/80 shadow-sm">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+          1. Bảng màu tương tác
+        </button>
+        <button id="nav-tab-slider" onclick="switchTab('slider')" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          2. So sánh ảnh thực tế
+        </button>
+        <button id="nav-tab-reverse" onclick="switchTab('reverse')" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+          3. Góc nhìn ngược
+        </button>
+        <button id="nav-tab-science" onclick="switchTab('science')" class="nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Khoa học & D-15
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- USER FARNSWORTH D-15 CLINICAL PROFILE BANNER -->
+    <section class="glass-card rounded-2xl p-5 border border-surface-700/80 shadow-2xl relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <!-- Diagnosis summary -->
+        <div class="lg:col-span-4 space-y-3">
+          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 text-xs font-bold tracking-wide">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+            HỒ SƠ LÂM SÀNG D-15 CỦA BẠN
+          </div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-white leading-tight">
+            Khiếm khuyết sắc giác <br class="hidden sm:inline"><span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-rose-400">Thể Kết Hợp (Combined)</span>
+          </h2>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Kết quả test Farnsworth D-15 chẩn đoán mắt của bạn có tổn thương thụ cảm chính ở <strong>tế bào nón M (72% Deuteranomaly)</strong> kèm theo sự suy yếu thứ cấp của <strong>tế bào nón L (28% Protanomaly)</strong>, trong khi nón S (Blue) hoàn toàn bình thường.
+          </p>
+          <div class="flex items-center gap-2 pt-1">
+            <button onclick="resetToUserD15()" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-surface-800 hover:bg-surface-700 border border-surface-600 text-cyan-300 transition-colors flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Khôi phục đúng kết quả D-15 của bạn
+            </button>
+            <button onclick="toggleD15Sliders()" id="btn-toggle-sliders" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-surface-800/60 hover:bg-surface-700/80 border border-surface-700 text-slate-300 transition-colors">
+              Tùy chỉnh thông số
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 Receptor Bar Gauges -->
+        <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <!-- M-Cone (Green) -->
+          <div class="bg-surface-900/90 rounded-xl p-3.5 border border-emerald-500/30 relative">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="font-bold text-emerald-400 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Nón M (Green)
+              </span>
+              <span id="label-m-error" class="font-mono font-bold text-emerald-300 text-sm">72%</span>
+            </div>
+            <div class="w-full bg-surface-800 rounded-full h-2.5 overflow-hidden">
+              <div id="bar-m-error" class="bg-gradient-to-r from-emerald-500 to-emerald-400 h-2.5 rounded-full transition-all duration-300" style="width: 72%"></div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2">Deuteranomaly nặng. Giảm độ phân biệt xanh lá - đỏ.</p>
+          </div>
+
+          <!-- L-Cone (Red) -->
+          <div class="bg-surface-900/90 rounded-xl p-3.5 border border-rose-500/30 relative">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="font-bold text-rose-400 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Nón L (Red)
+              </span>
+              <span id="label-l-error" class="font-mono font-bold text-rose-300 text-sm">28%</span>
+            </div>
+            <div class="w-full bg-surface-800 rounded-full h-2.5 overflow-hidden">
+              <div id="bar-l-error" class="bg-gradient-to-r from-rose-500 to-rose-400 h-2.5 rounded-full transition-all duration-300" style="width: 28%"></div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2">Protanomaly vừa. Giảm độ nhạy với ánh sáng đỏ sẫm.</p>
+          </div>
+
+          <!-- S-Cone (Blue) -->
+          <div class="bg-surface-900/90 rounded-xl p-3.5 border border-sky-500/30 relative">
+            <div class="flex items-center justify-between text-xs mb-1.5">
+              <span class="font-bold text-sky-400 flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span> Nón S (Blue)
+              </span>
+              <span id="label-s-error" class="font-mono font-bold text-sky-300 text-sm">0%</span>
+            </div>
+            <div class="w-full bg-surface-800 rounded-full h-2.5 overflow-hidden">
+              <div id="bar-s-error" class="bg-gradient-to-r from-sky-500 to-sky-400 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2">Hoàn hảo (0% lỗi). Nhận diện sắc xanh lam nguyên vẹn.</p>
+          </div>
+        </div>
+
+        <!-- Farnsworth D-15 Interactive Mini Circle Chart -->
+        <div class="lg:col-span-3 flex flex-col items-center justify-center p-2 bg-surface-900/60 rounded-xl border border-surface-700/60">
+          <div class="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5 mb-1">
+            <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-width="2"/></svg>
+            Biểu đồ khoanh nắp Farnsworth D-15
+          </div>
+          <div class="relative w-36 h-36 flex items-center justify-center">
+            <svg id="d15-circle-svg" viewBox="0 0 160 160" class="w-full h-full overflow-visible">
+              <!-- Will be rendered by JavaScript -->
+            </svg>
+          </div>
+          <div class="flex items-center gap-3 text-[10px] text-slate-400 mt-1">
+            <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-emerald-400 inline-block"></span> Vòng chuẩn</span>
+            <span class="flex items-center gap-1"><span class="w-2 h-0.5 bg-rose-400 inline-block"></span> Đường chéo chập màu</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expandable Slider Adjuster (Optional fine-tuning) -->
+      <div id="d15-sliders-panel" class="hidden mt-4 pt-4 border-t border-surface-800 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="text-xs text-emerald-300 font-semibold flex justify-between">
+            <span>Tổn thương Nón M (Green)</span>
+            <span id="slider-m-val" class="font-mono">72%</span>
+          </label>
+          <input type="range" id="slider-m" min="0" max="100" value="72" oninput="updateProfileFromSliders()" class="w-full mt-2 accent-emerald-400">
+        </div>
+        <div>
+          <label class="text-xs text-rose-300 font-semibold flex justify-between">
+            <span>Tổn thương Nón L (Red)</span>
+            <span id="slider-l-val" class="font-mono">28%</span>
+          </label>
+          <input type="range" id="slider-l" min="0" max="100" value="28" oninput="updateProfileFromSliders()" class="w-full mt-2 accent-rose-400">
+        </div>
+        <div>
+          <label class="text-xs text-sky-300 font-semibold flex justify-between">
+            <span>Tổn thương Nón S (Blue)</span>
+            <span id="slider-s-val" class="font-mono">0%</span>
+          </label>
+          <input type="range" id="slider-s" min="0" max="100" value="0" oninput="updateProfileFromSliders()" class="w-full mt-2 accent-sky-400">
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: BẢNG MÀU TƯƠNG TÁC (COLOR CONFUSION PALETTE) -->
+    <div id="section-palette" class="space-y-6">
+      <!-- Title & Explanation -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <span>Chế độ 1: Bảng màu tương tác (Color Confusion Palette)</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            So sánh trực quan các cặp màu mà người bình thường thấy rất tương phản, nhưng trong mắt bạn (72% Deutan + 28% Protan) chúng biến thành các sắc thái gần như đồng nhất.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 bg-surface-900 px-3 py-1.5 rounded-xl border border-surface-800 text-xs">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+          <span class="text-slate-300">Công thức mô phỏng: <strong class="text-white font-mono">Machado Cone Shift (LMS)</strong></span>
+        </div>
+      </div>
+
+      <!-- 4 Core Confusion Color Sets (Grid Cards) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="confusion-groups-container">
+        <!-- Rendered by JS: 4 required pairs + bonus pairs -->
+      </div>
+
+      <!-- Interactive Custom Color Picker & LMS Step-by-Step Inspector -->
+      <div class="glass-card rounded-2xl p-6 border border-surface-700/80 shadow-xl space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-surface-800 pb-4">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+              Kiểm tra màu sắc tùy ý & Chi tiết phân rã ma trận LMS
+            </h3>
+            <p class="text-xs text-slate-400">Chọn bất kỳ màu nào từ bảng chọn màu hoặc nhập mã HEX để theo dõi từng bước biến đổi từ tế bào nón mắt.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <label class="text-xs text-slate-300 font-semibold">Chọn màu:</label>
+            <input type="color" id="interactive-picker" value="#e11d48" oninput="onColorPickerChange(this.value)" class="w-10 h-10 rounded-lg cursor-pointer bg-transparent border-0">
+            <input type="text" id="interactive-hex" value="#E11D48" onchange="onColorPickerChange(this.value)" class="w-24 px-2.5 py-1.5 rounded-lg bg-surface-900 border border-surface-700 text-xs font-mono font-bold text-cyan-300 uppercase text-center focus:border-cyan-500 outline-none">
+          </div>
+        </div>
+
+        <!-- Live Dual Color Swatch Display -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Box 1: Normal Eye -->
+          <div class="bg-surface-900 rounded-xl p-4 border border-surface-700 flex items-center gap-4">
+            <div id="inspector-normal-box" class="w-20 h-20 rounded-xl color-swatch-ring shrink-0 transition-colors shadow-inner" style="background-color: #e11d48;"></div>
+            <div class="space-y-1">
+              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/30 text-emerald-300">
+                1. Mắt người bình thường
+              </span>
+              <div id="inspector-normal-hex" class="text-lg font-bold font-mono text-white">#E11D48</div>
+              <div id="inspector-normal-rgb" class="text-xs font-mono text-slate-400">RGB: (225, 29, 72)</div>
+              <div class="text-[11px] text-slate-400">Màu gốc quang phổ chuẩn sRGB</div>
+            </div>
+          </div>
+
+          <!-- Box 2: User Eye -->
+          <div class="bg-surface-900 rounded-xl p-4 border border-cyan-500/30 flex items-center gap-4 relative overflow-hidden">
+            <div class="absolute right-2 top-2">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500/40 text-cyan-300">D-15 Simulator</span>
+            </div>
+            <div id="inspector-sim-box" class="w-20 h-20 rounded-xl color-swatch-ring shrink-0 transition-colors shadow-inner" style="background-color: #8c7616;"></div>
+            <div class="space-y-1">
+              <span class="text-xs font-semibold px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/30 text-cyan-300">
+                2. Bạn (người dùng D-15) nhìn thấy
+              </span>
+              <div id="inspector-sim-hex" class="text-lg font-bold font-mono text-cyan-300">#8C7616</div>
+              <div id="inspector-sim-rgb" class="text-xs font-mono text-slate-400">RGB: (140, 118, 22)</div>
+              <div id="inspector-diff-metric" class="text-[11px] text-amber-300 font-medium">Hội tụ về sắc tố Vàng Nâu Ô-liu</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4-Step Mathematical LMS Pipeline Accordion / Flow -->
+        <div class="bg-surface-900/80 rounded-xl p-4 border border-surface-800 space-y-3">
+          <div class="text-xs font-bold text-slate-300 flex items-center gap-2">
+            <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Quy trình toán học 4 bước xử lý qua không gian tế bào nón LMS:
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs font-mono">
+            <!-- Step 1 -->
+            <div class="bg-surface-950 p-3 rounded-lg border border-surface-800">
+              <div class="text-[11px] text-cyan-400 font-sans font-semibold mb-1">Bước 1: Gamma Exp</div>
+              <div class="text-[10px] text-slate-400 font-sans">sRGB &rarr; Linear RGB</div>
+              <div id="math-step-1" class="text-slate-300 mt-2 text-[11px] leading-relaxed">
+                R_lin = 0.749<br>G_lin = 0.012<br>B_lin = 0.065
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="bg-surface-950 p-3 rounded-lg border border-surface-800">
+              <div class="text-[11px] text-cyan-400 font-sans font-semibold mb-1">Bước 2: Linear &rarr; LMS</div>
+              <div class="text-[10px] text-slate-400 font-sans">Chiếu vào 3 tế bào nón</div>
+              <div id="math-step-2" class="text-slate-300 mt-2 text-[11px] leading-relaxed">
+                L = 0.2458<br>M = 0.1311<br>S = 0.0712
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="bg-surface-950 p-3 rounded-lg border border-cyan-500/30 bg-cyan-950/20">
+              <div class="text-[11px] text-cyan-300 font-sans font-semibold mb-1">Bước 3: Lỗi 72% M + 28% L</div>
+              <div class="text-[10px] text-slate-400 font-sans">Phổ kích thích suy giảm</div>
+              <div id="math-step-3" class="text-cyan-200 mt-2 text-[11px] leading-relaxed">
+                L' = 0.1937<br>M' = 0.1815<br>S' = 0.0712
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="bg-surface-950 p-3 rounded-lg border border-surface-800">
+              <div class="text-[11px] text-cyan-400 font-sans font-semibold mb-1">Bước 4: LMS &rarr; sRGB'</div>
+              <div class="text-[10px] text-slate-400 font-sans">Linear RGB &rarr; Gamma clamp</div>
+              <div id="math-step-4" class="text-slate-300 mt-2 text-[11px] leading-relaxed">
+                R' = 140<br>G' = 118<br>B' = 22
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: SO SÁNH HÌNH ẢNH THỰC TẾ (INTERACTIVE IMAGE SLIDER) -->
+    <div id="section-slider" class="hidden space-y-5">
+      <!-- Title & Controls bar -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <span>Chế độ 2: So sánh hình ảnh thực tế (Interactive Image Slider)</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Kéo thanh trượt để so sánh trực quan từng nửa khung hình: Nửa trái là người mắt thường, nửa phải là người dùng D-15 nhìn thấy.
+          </p>
+        </div>
+
+        <!-- Presets and Custom Upload -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- Preset buttons -->
+          <div class="flex items-center bg-surface-900 p-1 rounded-xl border border-surface-800">
+            <button onclick="loadPresetImage('traffic')" id="btn-preset-traffic" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-cyan-400 bg-surface-800 border border-cyan-500/30">
+              🚦 Đèn & Biển báo
+            </button>
+            <button onclick="loadPresetImage('strawberry')" id="btn-preset-strawberry" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
+              🍓 Dâu tây & Lá
+            </button>
+            <button onclick="loadPresetImage('ishihara')" id="btn-preset-ishihara" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
+              🎯 Test Ishihara
+            </button>
+            <button onclick="loadPresetImage('meadow')" id="btn-preset-meadow" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
+              🌸 Cánh đồng hoa
+            </button>
+            <button onclick="loadPresetImage('rainbow')" id="btn-preset-rainbow" class="preset-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200">
+              🌈 Cầu vồng
+            </button>
+          </div>
+
+          <!-- Upload button -->
+          <label class="cursor-pointer px-3.5 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-black text-xs font-bold transition-all shadow-md shadow-cyan-500/20 flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <span>Tải ảnh cá nhân</span>
+            <input type="file" id="image-file-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+          </label>
+        </div>
+      </div>
+
+      <!-- View Modes & Stats Toolbar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
+        <div class="flex items-center gap-2 bg-surface-900 px-2.5 py-1.5 rounded-xl border border-surface-800">
+          <span class="text-slate-400">Kiểu hiển thị:</span>
+          <button onclick="setViewMode('slider')" id="btn-mode-slider" class="viewmode-btn px-2.5 py-1 rounded-lg text-cyan-400 font-semibold bg-surface-800">Thanh trượt chia đôi</button>
+          <button onclick="setViewMode('side')" id="btn-mode-side" class="viewmode-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-slate-200">Song song 2 bên</button>
+          <button onclick="setViewMode('toggle')" id="btn-mode-toggle" class="viewmode-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-slate-200">Nhấp chuột chuyển đổi</button>
+          <button onclick="setViewMode('heatmap')" id="btn-mode-heatmap" class="viewmode-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-slate-200">Bản đồ mất màu (Heatmap)</button>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <span id="render-benchmark-pill" class="font-mono text-cyan-400 bg-cyan-950/80 px-2.5 py-1 rounded-lg border border-cyan-500/30 text-[11px]">
+            Tốc độ Canvas: 11.2 ms
+          </span>
+          <button onclick="downloadSimulatedCanvas()" class="px-2.5 py-1 rounded-lg bg-surface-800 hover:bg-surface-700 text-slate-200 border border-surface-700 flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Tải ảnh kết quả
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN INTERACTIVE IMAGE CONTAINER -->
+      <div id="image-viewport" class="relative rounded-2xl overflow-hidden border border-surface-700/80 shadow-2xl bg-surface-950 select-none min-h-[440px] flex items-center justify-center">
+
+        <!-- Hidden processing canvases -->
+        <canvas id="canvas-original" class="hidden"></canvas>
+        <canvas id="canvas-simulated" class="hidden"></canvas>
+        <canvas id="canvas-heatmap" class="hidden"></canvas>
+
+        <!-- Display Container for Slider Mode -->
+        <div id="slider-display-wrap" class="relative w-full h-[520px] overflow-hidden flex items-center justify-center cursor-ew-resize">
+          <!-- Layer 1: Simulated Image (Full width background) -->
+          <canvas id="display-simulated-layer" class="absolute inset-0 w-full h-full object-contain pointer-events-none"></canvas>
+
+          <!-- Layer 2: Original Image (Clipped by slider percentage via clip-path) -->
+          <canvas id="display-original-layer" class="absolute inset-0 w-full h-full object-contain pointer-events-none" style="clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);"></canvas>
+
+          <!-- Divider Line & Draggable Handle -->
+          <div id="slider-divider" class="absolute top-0 bottom-0 w-0.5 bg-cyan-400 z-20 pointer-events-none" style="left: 50%;">
+            <div class="slider-handle absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 rounded-full bg-cyan-400 text-surface-950 flex items-center justify-center cursor-ew-resize pointer-events-auto">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/></svg>
+            </div>
+          </div>
+
+          <!-- Floating Badges -->
+          <div class="absolute top-4 left-4 z-30 pointer-events-none">
+            <span class="px-3 py-1.5 rounded-lg bg-surface-950/85 backdrop-blur-md border border-emerald-500/40 text-emerald-300 font-semibold text-xs shadow-lg flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Nửa trái: Mắt thường
+            </span>
+          </div>
+          <div class="absolute top-4 right-4 z-30 pointer-events-none">
+            <span class="px-3 py-1.5 rounded-lg bg-surface-950/85 backdrop-blur-md border border-cyan-500/40 text-cyan-300 font-semibold text-xs shadow-lg flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Nửa phải: Người dùng (D-15)
+            </span>
+          </div>
+
+          <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 pointer-events-none opacity-80 text-[11px] px-3 py-1 rounded-full bg-surface-950/80 backdrop-blur border border-surface-700 text-slate-300">
+            Kéo chuột hoặc ngón tay qua lại để so sánh
+          </div>
+        </div>
+
+        <!-- Display Container for Side-by-Side Mode (Hidden by default) -->
+        <div id="side-display-wrap" class="hidden w-full p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <div class="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Mắt người bình thường (Chuẩn sRGB)
+            </div>
+            <div class="h-[440px] bg-surface-900 rounded-xl overflow-hidden border border-surface-800 flex items-center justify-center">
+              <canvas id="display-side-original" class="w-full h-full object-contain"></canvas>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="text-xs font-semibold text-cyan-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Người dùng D-15 (72% Deutan + 28% Protan)
+            </div>
+            <div class="h-[440px] bg-surface-900 rounded-xl overflow-hidden border border-cyan-500/30 flex items-center justify-center">
+              <canvas id="display-side-simulated" class="w-full h-full object-contain"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Display Container for Heatmap Mode (Hidden by default) -->
+        <div id="heatmap-display-wrap" class="hidden w-full p-4 flex flex-col items-center">
+          <div class="text-xs text-slate-300 mb-2 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-gradient-to-r from-blue-600 via-yellow-400 to-red-600"></span>
+            <strong>Bản đồ nhiệt sai khác màu sắc (&Delta;E):</strong> Vùng màu đỏ/vàng là nơi mắt người dùng mất nhiều khả năng nhận diện nhất.
+          </div>
+          <div class="w-full h-[460px] bg-surface-900 rounded-xl overflow-hidden border border-surface-800 flex items-center justify-center">
+            <canvas id="display-heatmap-layer" class="w-full h-full object-contain"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Scene Clinical Explanation Card -->
+      <div id="scene-description-card" class="glass-card rounded-2xl p-5 border border-surface-700/80">
+        <div class="flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 mt-0.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div class="space-y-1">
+            <h4 id="scene-desc-title" class="text-sm font-bold text-white">Biển báo giao thông & Đèn tín hiệu đường phố</h4>
+            <p id="scene-desc-text" class="text-xs text-slate-300 leading-relaxed">
+              Đèn đỏ (vốn có tín hiệu cảnh báo mạnh) sẽ bị mất sắc đỏ rực rỡ và chuyển sang tông màu vàng mù tạt / hổ phách tương tự đèn vàng. Đèn xanh lá cây chuyển sang sắc trắng xanh ngọc nhạt. Biển báo cấm (viền đỏ) mất đi tính nổi bật khẩn cấp.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: GÓC NHÌN NGƯỢC (REVERSE SIMULATOR - DÀNH CHO NGƯỜI BÌNH THƯỜNG HIỂU NGƯỜI DÙNG) -->
+    <div id="section-reverse" class="hidden space-y-6">
+      <!-- Title & Explanation -->
+      <div class="space-y-2">
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 text-xs font-bold">
+          <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+          Góc nhìn thấu cảm (Empathy & Inversion Tool)
+        </div>
+        <h2 class="text-xl font-bold text-white">
+          Chế độ 3: Góc nhìn ngược (Dành cho người bình thường hiểu người dùng)
+        </h2>
+        <p class="text-xs text-slate-300 max-w-4xl leading-relaxed">
+          Người có thị giác bình thường thường thắc mắc: <em>"Tại sao họ lại nhầm quả dâu đỏ chín với lá xanh?", "Tại sao không phân biệt được đèn giao thông?"</em>. Công cụ dưới đây giúp người bình thường chọn một màu bất kỳ, hệ thống sẽ tự động quét trục đồng sắc (isochromatic line) và hiển thị các màu sắc khác trong thế giới thực mà người dùng sẽ thấy <strong>hoàn toàn giống nhau</strong>.
+        </p>
+      </div>
+
+      <!-- Reverse Confusion Finder Tool -->
+      <div class="glass-card rounded-2xl p-6 border border-surface-700/80 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-800 pb-4">
+          <div>
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+              <svg class="w-5 h-5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke-width="2"/></svg>
+              Máy dò màu đồng sắc (Confusion Isocline Detector)
+            </h3>
+            <p class="text-xs text-slate-400">Chọn 1 màu mục tiêu bất kỳ mà người bình thường thấy:</p>
+          </div>
+
+          <!-- Quick Sample buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button onclick="setReverseTargetColor('#dc2626')" class="px-2.5 py-1 rounded-lg text-xs bg-red-950/60 border border-red-500/40 text-red-300 hover:bg-red-900/60 font-medium">🍓 Đỏ quả dâu</button>
+            <button onclick="setReverseTargetColor('#15803d')" class="px-2.5 py-1 rounded-lg text-xs bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/60 font-medium">🍃 Xanh lá cây</button>
+            <button onclick="setReverseTargetColor('#9333ea')" class="px-2.5 py-1 rounded-lg text-xs bg-purple-950/60 border border-purple-500/40 text-purple-300 hover:bg-purple-900/60 font-medium">🍇 Tím nho</button>
+            <button onclick="setReverseTargetColor('#0d9488')" class="px-2.5 py-1 rounded-lg text-xs bg-teal-950/60 border border-teal-500/40 text-teal-300 hover:bg-teal-900/60 font-medium">🌊 Xanh ngọc</button>
+            <input type="color" id="reverse-picker" value="#dc2626" oninput="setReverseTargetColor(this.value)" class="w-8 h-8 rounded-md cursor-pointer bg-transparent border-0">
+          </div>
+        </div>
+
+        <!-- Result of Confusion Isocline -->
+        <div class="space-y-4">
+          <div class="bg-surface-900/90 rounded-xl p-4 border border-surface-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div id="reverse-target-swatch" class="w-14 h-14 rounded-xl color-swatch-ring shrink-0" style="background-color: #dc2626;"></div>
+              <div>
+                <span class="text-[11px] font-semibold text-slate-400">Màu bạn (người bình thường) đang chọn:</span>
+                <div id="reverse-target-hex" class="text-base font-bold font-mono text-white">#DC2626 (Đỏ thắm)</div>
+                <div id="reverse-target-rgb" class="text-xs font-mono text-slate-400">RGB: (220, 38, 38)</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <svg class="w-6 h-6 text-indigo-400 hidden md:block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              <div id="reverse-target-sim-swatch" class="w-14 h-14 rounded-xl color-swatch-ring shrink-0" style="background-color: #8c7616;"></div>
+              <div>
+                <span class="text-[11px] font-semibold text-cyan-300">Người dùng D-15 nhìn thấy màu này thành:</span>
+                <div id="reverse-target-sim-hex" class="text-base font-bold font-mono text-cyan-300">#8C7616 (Vàng Nâu Khaki)</div>
+                <div class="text-xs text-slate-400">Sắc độ hội tụ về trục Deutan</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- The Confused Family -->
+          <div class="space-y-2">
+            <div class="text-xs font-bold text-slate-200 flex items-center justify-between">
+              <span>Các màu sắc khác trong tự nhiên mà người dùng D-15 sẽ thấy GẦN NHƯ Y HỆT màu trên:</span>
+              <span class="text-[11px] text-cyan-400 font-mono font-normal">Quét trên trục đẳng sắc Machado</span>
+            </div>
+
+            <div id="confused-family-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Contextual Explanation -->
+        <div id="reverse-narrative-box" class="p-4 rounded-xl bg-gradient-to-r from-surface-900 to-indigo-950/40 border border-indigo-500/30 text-xs leading-relaxed space-y-2">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Real-world Life Scenarios Library -->
+      <div class="space-y-4">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <svg class="w-5 h-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Thư viện tình huống đời sống & Cách người dùng thích nghi thực tế
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Scenario 1: Cooking & Meat -->
+          <div class="glass-card rounded-xl p-4 border border-surface-700 space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-sm">🥩</div>
+            <h4 class="text-sm font-bold text-white">Nấu nướng & Nhận biết độ chín</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Màu đỏ của thịt sống và màu nâu xám của thịt chín tái (medium-rare) trong mắt người dùng đều là các tông xám nâu xỉn. Họ không dựa vào màu sắc mà dùng cảm giác ấn tay vào độ săn của thớ thịt, hoặc dùng nhiệt kế đo tâm thực phẩm.
+            </p>
+          </div>
+
+          <!-- Scenario 2: Traffic Signals -->
+          <div class="glass-card rounded-xl p-4 border border-surface-700 space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-sm">🚦</div>
+            <h4 class="text-sm font-bold text-white">Lái xe & Tín hiệu giao thông</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Đèn đỏ và đèn vàng có sắc độ quang phổ cực kỳ gần nhau (đều là vàng cam mù tạt). Người dùng thích nghi hoàn toàn bằng cách <strong>nhớ thứ tự vị trí</strong>: Đèn Đỏ luôn ở trên cùng (hoặc bên trái cùng), Đèn Vàng ở giữa, Đèn Xanh ở dưới cùng.
+            </p>
+          </div>
+
+          <!-- Scenario 3: UI & Data Dashboards -->
+          <div class="glass-card rounded-xl p-4 border border-surface-700 space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-sm">💻</div>
+            <h4 class="text-sm font-bold text-white">Thiết kế UI/UX & Đồ thị dữ liệu</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Biểu đồ doanh thu dùng Xanh lá (Lãi) và Đỏ (Lỗ) sẽ hoàn toàn vô nghĩa với họ vì 2 màu này mất hẳn độ tương phản màu sắc. Bắt buộc nhà thiết kế phải kết hợp thêm biểu tượng (&uarr; / &darr;), hoa văn gạch chéo hoặc độ sáng tối (Luminance).
+            </p>
+          </div>
+
+          <!-- Scenario 4: Fashion & Outfits -->
+          <div class="glass-card rounded-xl p-4 border border-surface-700 space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold text-sm">👔</div>
+            <h4 class="text-sm font-bold text-white">Chọn trang phục & Tất chân</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Rất khó phân biệt chiếc tất đen với chiếc tất xanh đen (navy), hoặc áo màu đỏ sẫm với quần màu xanh rêu. Người khiếm khuyết sắc giác thường đánh dấu nhãn tủ đồ hoặc nhờ người thân dán mã màu phân loại từ trước.
+            </p>
+          </div>
+
+          <!-- Scenario 5: Gaming & Minimap -->
+          <div class="glass-card rounded-xl p-4 border border-surface-700 space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-sm">🎮</div>
+            <h4 class="text-sm font-bold text-white">Trò chơi điện tử & Bản đồ Minimap</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Trong các tựa game MOBA / FPS, chấm đỏ (quân địch) trên nền bản đồ xanh lá cây sẽ biến mất hoàn toàn vào địa hình. Các game hiện đại cung cấp chế độ Colorblind Mode đổi quân địch sang màu vàng rực hoặc xanh dương để khắc phục.
+            </p>
+          </div>
+
+          <!-- Scenario 6: Battery & Charger LED -->
+          <div class="glass-card rounded-xl p-4 border border-surface-700 space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold text-sm">🔋</div>
+            <h4 class="text-sm font-bold text-white">Đèn LED báo sạc thiết bị</h4>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              Đèn LED đơn sắc chuyển từ Đỏ (Đang sạc) sang Xanh lá (Đã đầy) là cơn ác mộng phổ biến. Họ thường phải ghé sát mắt nhìn độ nhấp nháy hoặc rút sạc kiểm tra màn hình thiết bị thay vì nhìn đèn LED từ xa.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: KHOA HỌC & THUẬT TOÁN LMS (SCIENCE & D-15) -->
+    <div id="section-science" class="hidden space-y-6">
+      <div class="space-y-2">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <span>Khoa học thị giác & Thuật toán biến đổi không gian nón LMS</span>
+        </h2>
+        <p class="text-xs text-slate-300 max-w-4xl leading-relaxed">
+          Giải thích chi tiết nguyên lý hoạt động của mắt người, phép thử lâm sàng Farnsworth D-15 và thuật toán mô phỏng Machado et al. (2009) được cài đặt trong ứng dụng.
+        </p>
+      </div>
+
+      <!-- Theory cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- Card 1: 3 Cones -->
+        <div class="glass-card rounded-xl p-5 border border-surface-700 space-y-3">
+          <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-white">1. Ba loại tế bào nón (Trichromacy)</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Võng mạc người bình thường sở hữu 3 loại tế bào nón:
+          </p>
+          <ul class="text-xs space-y-1.5 text-slate-300">
+            <li class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+              <strong>Nón L (Long):</strong> Hấp thụ &sim;560 nm (Sắc đỏ)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <strong>Nón M (Medium):</strong> Hấp thụ &sim;530 nm (Sắc xanh lục)
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+              <strong>Nón S (Short):</strong> Hấp thụ &sim;420 nm (Sắc xanh lam)
+            </li>
+          </ul>
+          <p class="text-[11px] text-slate-400">
+            Khả năng phân biệt màu đỏ - xanh lá dựa vào sự chênh lệch tín hiệu kích thích giữa tế bào nón L và M.
+          </p>
+        </div>
+
+        <!-- Card 2: D-15 Test -->
+        <div class="glass-card rounded-xl p-5 border border-surface-700 space-y-3">
+          <div class="w-10 h-10 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 2a10 10 0 0 1 10 10" stroke-width="2"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-white">2. Phép thử Farnsworth D-15</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Farnsworth D-15 là phép kiểm tra sắc giác lâm sàng tiêu chuẩn được thiết kế bởi Dean Farnsworth năm 1943. Bệnh nhân được yêu cầu sắp xếp 15 nắp màu thành một chuỗi màu sắc liên tục xuất phát từ nắp mốc (pilot cap).
+          </p>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Khi người khám có khiếm khuyết, chuỗi sắp xếp sẽ cắt ngang vòng tròn màu sắc theo các trục đặc trưng:
+          </p>
+          <ul class="text-[11px] space-y-1 text-slate-400">
+            <li>&bull; <strong>Trục Deutan:</strong> Cắt chéo nắp 1-15, 2-14, 5-11</li>
+            <li>&bull; <strong>Trục Protan:</strong> Cắt chéo nắp 15-1, 14-2, 12-4</li>
+            <li>&bull; <strong>Trục Tritan:</strong> Cắt chéo nắp 1-5, 15-9</li>
+          </ul>
+        </div>
+
+        <!-- Card 3: Machado Algorithm -->
+        <div class="glass-card rounded-xl p-5 border border-surface-700 space-y-3">
+          <div class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center font-bold">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-white">3. Thuật toán Machado et al. 2009</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Khác với các mô hình đơn giản hóa chỉ xét mù màu toàn phần (Dichromacy), mô hình của Machado et al. mô phỏng sự dịch chuyển bước sóng đỉnh phổ hấp thụ (Spectral Sensitivity Shift) của sắc tố quang học.
+          </p>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Nhờ đó, mô hình tái hiện chính xác trường hợp <strong>tam sắc bất thường kết hợp (72% Deuteranomaly + 28% Protanomaly)</strong> mà không làm sai lệch màu trắng trung tính hoặc độ sáng tự nhiên.
+          </p>
+        </div>
+      </div>
+
+      <!-- Exact Transformation Matrix formulas in app -->
+      <div class="glass-card rounded-xl p-5 border border-surface-700 space-y-3">
+        <h3 class="text-sm font-bold text-white">Ma trận chuyển đổi tuyến tính kết hợp đang áp dụng trong hệ thống:</h3>
+        <div class="bg-surface-950 p-4 rounded-xl font-mono text-xs text-cyan-300 overflow-x-auto leading-relaxed border border-surface-800">
+          <pre>
+// Ma trận tổ hợp phản ánh 72% lỗi nón M (Deutan) + 28% lỗi nón L (Protan):
+M_combined = [
+  [ +0.30711, +0.91439, -0.22150 ],
+  [ +0.23372, +0.70436, +0.06192 ],
+  [ -0.00960, +0.01744, +0.99215 ]
+];
+
+// Bảo toàn màu trắng D65 trung tính: Tổng mỗi hàng = 1.0000
+Row 1 Sum = 0.30711 + 0.91439 - 0.22150 = 1.00000
+Row 2 Sum = 0.23372 + 0.70436 + 0.06192 = 1.00000
+Row 3 Sum = -0.00960 + 0.01744 + 0.99215 = 1.00000
+          </pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-surface-800 bg-surface-900/60 py-6 text-center text-xs text-slate-400 mt-12">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+        <span>D-15 Vision Lens &copy; 2026. Xây dựng dựa trên dữ liệu Farnsworth D-15 & Machado et al. (IEEE TVCG 2009).</span>
+      </div>
+      <div class="text-slate-400 font-mono text-[11px]">
+        Engine: Canvas 2D LUT Acceleration &bull; 60 FPS
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT APPLICATION CODE -->
+  <script>
+    /* ==========================================================================
+       1. COLOR SCIENCE ENGINE (MACHADO & LMS TRANSFORMATION)
+       ========================================================================== */
+
+    // User D-15 Clinical Error Profile
+    let userProfile = {
+      mError: 0.72, // 72% Green (Deutan)
+      lError: 0.28, // 28% Red (Protan)
+      sError: 0.00  // 0% Blue (Tritan)
+    };
+
+    // Standard Stockman & Sharpe / Machado Cone Matrices
+    // Linear RGB to LMS
+    const M_RGB_TO_LMS = [
+      [0.31399022, 0.63951294, 0.04649755],
+      [0.15537241, 0.75789446, 0.08670142],
+      [0.01775239, 0.10944209, 0.87256922]
+    ];
+
+    // Machado 2009 Dichromat Linear RGB Matrices (1.0 severity)
+    const MACHADO_DEUT_100 = [
+      [0.367322, 0.860646, -0.227968],
+      [0.280085, 0.672501, 0.047413],
+      [-0.011820, 0.042940, 0.968881]
+    ];
+
+    const MACHADO_PROT_100 = [
+      [0.152286, 1.052583, -0.204868],
+      [0.114503, 0.786281, 0.099216],
+      [-0.003882, -0.048116, 1.051998]
+    ];
+
+    const MACHADO_TRIT_100 = [
+      [1.255528, -0.076749, -0.178779],
+      [-0.078411, 0.930809, 0.147602],
+      [0.004733, 0.691367, 0.303900]
+    ];
+
+    // Precomputed Current Composite 3x3 Linear Matrix
+    let currentMatrix = [
+      [1, 0, 0],
+      [0, 1, 0],
+      [0, 0, 1]
+    ];
+
+    // Precomputed Lookup Tables (LUT) for instant gamma expansion and compression
+    const LUT_TO_LIN = new Float32Array(256);
+    for (let i = 0; i < 256; i++) {
+      const c = i / 255.0;
+      LUT_TO_LIN[i] = c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    }
+
+    const LUT_SRGB_SIZE = 4096;
+    const LUT_TO_SRGB = new Uint8Array(LUT_SRGB_SIZE + 1);
+    for (let i = 0; i <= LUT_SRGB_SIZE; i++) {
+      const c = i / LUT_SRGB_SIZE;
+      const s = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1.0 / 2.4) - 0.055;
+      LUT_TO_SRGB[i] = Math.min(255, Math.max(0, Math.round(s * 255)));
+    }
+
+    function fastLinToSrgb(val) {
+      if (val <= 0) return 0;
+      if (val >= 1) return 255;
+      return LUT_TO_SRGB[(val * LUT_SRGB_SIZE + 0.5) | 0];
+    }
+
+    function recomputeCompositeMatrix() {
+      const sM = userProfile.mError;
+      const sL = userProfile.lError;
+      const sS = userProfile.sError;
+
+      // M_sim = I + sM*(M_deut - I) + sL*(M_prot - I) + sS*(M_trit - I)
+      for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+          const I = (r === c ? 1 : 0);
+          currentMatrix[r][c] = I 
+            + sM * (MACHADO_DEUT_100[r][c] - I)
+            + sL * (MACHADO_PROT_100[r][c] - I)
+            + sS * (MACHADO_TRIT_100[r][c] - I);
+        }
+      }
+    }
+    recomputeCompositeMatrix();
+
+    // Helper: Simulate single [R, G, B]
+    function simulateRGB(r, g, b) {
+      const rLin = LUT_TO_LIN[r];
+      const gLin = LUT_TO_LIN[g];
+      const bLin = LUT_TO_LIN[b];
+
+      const rSimLin = currentMatrix[0][0] * rLin + currentMatrix[0][1] * gLin + currentMatrix[0][2] * bLin;
+      const gSimLin = currentMatrix[1][0] * rLin + currentMatrix[1][1] * gLin + currentMatrix[1][2] * bLin;
+      const bSimLin = currentMatrix[2][0] * rLin + currentMatrix[2][1] * gLin + currentMatrix[2][2] * bLin;
+
+      return [
+        fastLinToSrgb(rSimLin),
+        fastLinToSrgb(gSimLin),
+        fastLinToSrgb(bSimLin)
+      ];
+    }
+
+    // Helper: sRGB to LMS detailed decomposition
+    function getLmsBreakdown(r, g, b) {
+      const rLin = LUT_TO_LIN[r];
+      const gLin = LUT_TO_LIN[g];
+      const bLin = LUT_TO_LIN[b];
+
+      const L = M_RGB_TO_LMS[0][0] * rLin + M_RGB_TO_LMS[0][1] * gLin + M_RGB_TO_LMS[0][2] * bLin;
+      const M = M_RGB_TO_LMS[1][0] * rLin + M_RGB_TO_LMS[1][1] * gLin + M_RGB_TO_LMS[1][2] * bLin;
+      const S = M_RGB_TO_LMS[2][0] * rLin + M_RGB_TO_LMS[2][1] * gLin + M_RGB_TO_LMS[2][2] * bLin;
+
+      const [simR, simG, simB] = simulateRGB(r, g, b);
+      const rSimLin = LUT_TO_LIN[simR];
+      const gSimLin = LUT_TO_LIN[simG];
+      const bSimLin = LUT_TO_LIN[simB];
+
+      const L_prime = M_RGB_TO_LMS[0][0] * rSimLin + M_RGB_TO_LMS[0][1] * gSimLin + M_RGB_TO_LMS[0][2] * bSimLin;
+      const M_prime = M_RGB_TO_LMS[1][0] * rSimLin + M_RGB_TO_LMS[1][1] * gSimLin + M_RGB_TO_LMS[1][2] * bSimLin;
+      const S_prime = M_RGB_TO_LMS[2][0] * rSimLin + M_RGB_TO_LMS[2][1] * gSimLin + M_RGB_TO_LMS[2][2] * bSimLin;
+
+      return {
+        rLin, gLin, bLin,
+        L, M, S,
+        L_prime, M_prime, S_prime,
+        simR, simG, simB
+      };
+    }
+
+    function hexToRgb(hex) {
+      hex = hex.replace('#', '').trim();
+      if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+      }
+      const val = parseInt(hex, 16);
+      if (isNaN(val) || hex.length !== 6) return [225, 29, 72];
+      return [(val >> 16) & 255, (val >> 8) & 255, val & 255];
+    }
+
+    function rgbToHex(r, g, b) {
+      return '#' + [r, g, b].map(x => {
+        const h = Math.min(255, Math.max(0, x)).toString(16);
+        return h.length === 1 ? '0' + h : h;
+      }).join('').toUpperCase();
+    }
+
+    // Perceptual color difference (Euclidean in adjusted sRGB)
+    function colorDistance(rgb1, rgb2) {
+      const rmean = (rgb1[0] + rgb2[0]) / 2;
+      const r = rgb1[0] - rgb2[0];
+      const g = rgb1[1] - rgb2[1];
+      const b = rgb1[2] - rgb2[2];
+      return Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
+    }
+
+    /* ==========================================================================
+       2. TAB NAVIGATION & VIEW CONTROLS
+       ========================================================================== */
+
+    let activeTab = 'palette';
+
+    function switchTab(tabId) {
+      activeTab = tabId;
+      const tabs = ['palette', 'slider', 'reverse', 'science'];
+      tabs.forEach(t => {
+        const sec = document.getElementById(`section-${t}`);
+        const btn = document.getElementById(`nav-tab-${t}`);
+        if (t === tabId) {
+          sec.classList.remove('hidden');
+          btn.className = 'nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 text-cyan-400 bg-surface-700/80 shadow-sm';
+        } else {
+          sec.classList.add('hidden');
+          btn.className = 'nav-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200';
+        }
+      });
+
+      if (tabId === 'slider') {
+        renderCurrentScene();
+      }
+    }
+
+    function toggleD15Sliders() {
+      const panel = document.getElementById('d15-sliders-panel');
+      panel.classList.toggle('hidden');
+    }
+
+    function updateProfileFromSliders() {
+      const mVal = parseInt(document.getElementById('slider-m').value) / 100;
+      const lVal = parseInt(document.getElementById('slider-l').value) / 100;
+      const sVal = parseInt(document.getElementById('slider-s').value) / 100;
+
+      userProfile.mError = mVal;
+      userProfile.lError = lVal;
+      userProfile.sError = sVal;
+
+      document.getElementById('slider-m-val').innerText = `${Math.round(mVal * 100)}%`;
+      document.getElementById('slider-l-val').innerText = `${Math.round(lVal * 100)}%`;
+      document.getElementById('slider-s-val').innerText = `${Math.round(sVal * 100)}%`;
+
+      document.getElementById('label-m-error').innerText = `${Math.round(mVal * 100)}%`;
+      document.getElementById('label-l-error').innerText = `${Math.round(lVal * 100)}%`;
+      document.getElementById('label-s-error').innerText = `${Math.round(sVal * 100)}%`;
+
+      document.getElementById('bar-m-error').style.width = `${Math.round(mVal * 100)}%`;
+      document.getElementById('bar-l-error').style.width = `${Math.round(lVal * 100)}%`;
+      document.getElementById('bar-s-error').style.width = `${Math.round(sVal * 100)}%`;
+
+      recomputeCompositeMatrix();
+      renderConfusionPalette();
+      onColorPickerChange(document.getElementById('interactive-picker').value);
+      updateReverseConfusion();
+      drawD15Circle();
+
+      if (activeTab === 'slider') {
+        renderCurrentScene();
+      }
+    }
+
+    function resetToUserD15() {
+      document.getElementById('slider-m').value = 72;
+      document.getElementById('slider-l').value = 28;
+      document.getElementById('slider-s').value = 0;
+      updateProfileFromSliders();
+    }
+
+    /* ==========================================================================
+       3. FARNSWORTH D-15 INTERACTIVE CIRCLE VISUALIZER
+       ========================================================================== */
+
+    const D15_CAPS = [
+      { id: 0, name: 'Pilot', hex: '#31698a' },
+      { id: 1, name: '1', hex: '#357b8b' },
+      { id: 2, name: '2', hex: '#378d8a' },
+      { id: 3, name: '3', hex: '#3c9e83' },
+      { id: 4, name: '4', hex: '#55a676' },
+      { id: 5, name: '5', hex: '#75a666' },
+      { id: 6, name: '6', hex: '#95a153' },
+      { id: 7, name: '7', hex: '#ab984a' },
+      { id: 8, name: '8', hex: '#be8e4a' },
+      { id: 9, name: '9', hex: '#c68456' },
+      { id: 10, name: '10', hex: '#c57c6b' },
+      { id: 11, name: '11', hex: '#bb7880' },
+      { id: 12, name: '12', hex: '#ab7896' },
+      { id: 13, name: '13', hex: '#927caa' },
+      { id: 14, name: '14', hex: '#7182b5' },
+      { id: 15, name: '15', hex: '#5081ac' }
+    ];
+
+    function drawD15Circle() {
+      const svg = document.getElementById('d15-circle-svg');
+      const cx = 80, cy = 80, r = 58;
+      const numCaps = 16;
+      let svgHtml = '';
+
+      // Calculate cap coordinates
+      const coords = [];
+      for (let i = 0; i < numCaps; i++) {
+        // Angles distributed evenly starting at top
+        const angle = (i / numCaps) * 2 * Math.PI - Math.PI / 2;
+        const x = cx + r * Math.cos(angle);
+        const y = cy + r * Math.sin(angle);
+        coords.push({ x, y, cap: D15_CAPS[i] });
+      }
+
+      // Normal Circle Path (Dotted green loop)
+      let normalPathD = `M ${coords[0].x} ${coords[0].y}`;
+      for (let i = 1; i < numCaps; i++) {
+        normalPathD += ` L ${coords[i].x} ${coords[i].y}`;
+      }
+      normalPathD += ' Z';
+      svgHtml += `<path d="${normalPathD}" fill="none" stroke="#10b981" stroke-width="1.2" stroke-dasharray="2,2" opacity="0.45" />`;
+
+      // User's Deficient Crossover Chords
+      // Predominant Deutan crossings (1-15, 2-14, 3-13, 5-11, etc.)
+      const deutChords = [
+        [1, 15],
+        [2, 14],
+        [3, 13],
+        [5, 11],
+        [6, 10]
+      ];
+
+      deutChords.forEach(([from, to]) => {
+        const c1 = coords[from];
+        const c2 = coords[to];
+        svgHtml += `<line x1="${c1.x}" y1="${c1.y}" x2="${c2.x}" y2="${c2.y}" stroke="#f43f5e" stroke-width="1.6" opacity="0.8" />`;
+      });
+
+      // Draw Cap Dots
+      coords.forEach((pt, i) => {
+        const isPilot = i === 0;
+        const [rSim, gSim, bSim] = simulateRGB(...hexToRgb(pt.cap.hex));
+        const simHex = rgbToHex(rSim, gSim, bSim);
+
+        svgHtml += `
+          <g class="cursor-pointer group">
+            <circle cx="${pt.x}" cy="${pt.y}" r="${isPilot ? 6.5 : 5.5}" fill="${pt.cap.hex}" stroke="${isPilot ? '#38bdf8' : '#0d1322'}" stroke-width="1.5" />
+            <title>Nắp ${pt.cap.name} (${pt.cap.hex}) &#10;Bạn nhìn thấy: ${simHex}</title>
+          </g>
+        `;
+      });
+
+      svg.innerHTML = svgHtml;
+    }
+
+    /* ==========================================================================
+       4. TAB 1: COLOR CONFUSION PALETTE
+       ========================================================================== */
+
+    const CONFUSION_GROUPS_DATA = [
+      {
+        id: 'group-1',
+        title: 'Bộ 1: Đỏ tươi vs Xanh lá đậm vs Nâu đất',
+        badge: 'Trục nhầm lẫn Deutan điển hình',
+        note: 'Trong mắt người dùng, màu Đỏ tươi (#E52020) và Xanh lá đậm (#1E821E) đều mất đi tính đối lập quang phổ và cùng hội tụ về sắc tố vàng nâu mù tạt (#897A11 và #7D7023), gần như hòa trộn vào màu Nâu đất.',
+        colors: [
+          { name: 'Đỏ tươi (Bright Red)', hex: '#E52020' },
+          { name: 'Xanh lá đậm (Dark Green)', hex: '#1E821E' },
+          { name: 'Nâu đất (Earth Brown)', hex: '#82461E' }
+        ]
+      },
+      {
+        id: 'group-2',
+        title: 'Bộ 2: Xanh lam (Blue) vs Tím (Purple / Violet)',
+        badge: 'Mất thành phần nón Đỏ trong màu Tím',
+        note: 'Màu tím thực chất là sự hòa trộn giữa xanh lam và đỏ. Do nón L và M bị suy giảm, mắt người dùng không thu nhận được thành phần đỏ, khiến màu tím rực rỡ trông y hệt như màu xanh lam thuần khiết.',
+        colors: [
+          { name: 'Xanh lam (Pure Blue)', hex: '#1D4ED8' },
+          { name: 'Tím đậm (Deep Violet)', hex: '#7E22CE' },
+          { name: 'Tím cà (Mauve / Lilac)', hex: '#A855F7' }
+        ]
+      },
+      {
+        id: 'group-3',
+        title: 'Bộ 3: Xanh ngọc (Cyan / Teal) vs Xám / Trắng bạc',
+        badge: 'Điểm trung tính (Neutral Point ~498nm)',
+        note: 'Vùng bước sóng xanh ngọc nằm đúng trên trục trung tính của người Deutan. Não bộ không phân biệt được nó với ánh sáng trắng/xám, khiến màu xanh ngọc bích sang trọng bị biến thành màu xám bạc nhờ nhờ.',
+        colors: [
+          { name: 'Xanh ngọc (Cyan Teal)', hex: '#0D9488' },
+          { name: 'Xanh lơ biển (Light Cyan)', hex: '#06B6D4' },
+          { name: 'Xám bạc (Silver Gray)', hex: '#94A3B8' }
+        ]
+      },
+      {
+        id: 'group-4',
+        title: 'Bộ 4: Vàng chanh vs Xanh lá mạ',
+        badge: 'Suy giảm độ tương phản sắc lục',
+        note: 'Sắc tố xanh lá non (lá mạ) mất đi thành phần lục, ngả hoàn toàn sang gam vàng xỉn. Người dùng rất khó phân biệt đâu là màu vàng chanh đâu là màu đọt chuối non.',
+        colors: [
+          { name: 'Vàng chanh (Lemon Yellow)', hex: '#FACC15' },
+          { name: 'Xanh lá mạ (Chartreuse)', hex: '#A3E635' },
+          { name: 'Vàng rơm (Straw Gold)', hex: '#EAB308' }
+        ]
+      },
+      {
+        id: 'group-5',
+        title: 'Bộ 5: Tín hiệu giao thông & Bảng màu UI UX',
+        badge: 'Ứng dụng thực tế đời sống',
+        note: 'Màu đỏ báo nguy hiểm (Danger) và màu vàng cảnh báo (Warning) trong mắt người dùng đều chuyển thành tông vàng cam đất. Nếu UI chỉ dùng màu mà không có icon cảnh báo, người dùng sẽ rất dễ bấm nhầm.',
+        colors: [
+          { name: 'Đỏ nguy hiểm (Danger Red)', hex: '#EF4444' },
+          { name: 'Vàng cảnh báo (Warning Amber)', hex: '#F59E0B' },
+          { name: 'Xanh lá an toàn (Success Green)', hex: '#10B981' }
+        ]
+      }
+    ];
+
+    function renderConfusionPalette() {
+      const container = document.getElementById('confusion-groups-container');
+      let html = '';
+
+      CONFUSION_GROUPS_DATA.forEach(grp => {
+        html += `
+          <div class="glass-card rounded-2xl p-5 border border-surface-700 space-y-4 glass-card-hover">
+            <div class="flex items-center justify-between border-b border-surface-800 pb-3">
+              <div>
+                <h3 class="text-sm font-bold text-white">${grp.title}</h3>
+                <span class="text-[10px] text-cyan-400 font-semibold">${grp.badge}</span>
+              </div>
+            </div>
+
+            <!-- Color Swatches Grid -->
+            <div class="space-y-3">
+        `;
+
+        grp.colors.forEach(col => {
+          const origRgb = hexToRgb(col.hex);
+          const simRgb = simulateRGB(...origRgb);
+          const simHex = rgbToHex(...simRgb);
+          const dist = colorDistance(origRgb, simRgb);
+
+          html += `
+            <div class="bg-surface-900/80 rounded-xl p-3 border border-surface-800 flex items-center justify-between gap-3 cursor-pointer hover:border-cyan-500/40 transition-colors" onclick="selectPaletteColor('${col.hex}')">
+              <!-- Info -->
+              <div class="space-y-0.5">
+                <div class="text-xs font-semibold text-slate-200">${col.name}</div>
+                <div class="text-[11px] font-mono text-slate-400">Gốc: <span class="text-slate-300 font-bold">${col.hex}</span> &rarr; Bạn thấy: <span class="text-cyan-300 font-bold">${simHex}</span></div>
+              </div>
+
+              <!-- Dual Box Swatch -->
+              <div class="flex items-center gap-1.5 shrink-0">
+                <div class="text-center">
+                  <div class="w-10 h-10 rounded-lg color-swatch-ring" style="background-color: ${col.hex};"></div>
+                  <span class="text-[9px] text-slate-400">Mắt thường</span>
+                </div>
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <div class="text-center">
+                  <div class="w-10 h-10 rounded-lg color-swatch-ring" style="background-color: ${simHex};"></div>
+                  <span class="text-[9px] text-cyan-400 font-semibold">Bạn thấy</span>
+                </div>
+              </div>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed bg-surface-950/60 p-2.5 rounded-lg border border-surface-850">
+              ${grp.note}
+            </p>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function selectPaletteColor(hex) {
+      document.getElementById('interactive-picker').value = hex;
+      onColorPickerChange(hex);
+      // Smooth scroll to inspector
+      document.getElementById('interactive-picker').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function onColorPickerChange(hex) {
+      if (!hex.startsWith('#')) hex = '#' + hex;
+      const rgb = hexToRgb(hex);
+      const hexNormalized = rgbToHex(...rgb);
+      document.getElementById('interactive-hex').value = hexNormalized;
+      document.getElementById('interactive-picker').value = hexNormalized;
+
+      const breakdown = getLmsBreakdown(...rgb);
+      const simHex = rgbToHex(breakdown.simR, breakdown.simG, breakdown.simB);
+
+      // Update Swatches
+      document.getElementById('inspector-normal-box').style.backgroundColor = hexNormalized;
+      document.getElementById('inspector-normal-hex').innerText = hexNormalized;
+      document.getElementById('inspector-normal-rgb').innerText = `RGB: (${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+
+      document.getElementById('inspector-sim-box').style.backgroundColor = simHex;
+      document.getElementById('inspector-sim-hex').innerText = simHex;
+      document.getElementById('inspector-sim-rgb').innerText = `RGB: (${breakdown.simR}, ${breakdown.simG}, ${breakdown.simB})`;
+
+      // Distance metric
+      const dist = colorDistance(rgb, [breakdown.simR, breakdown.simG, breakdown.simB]);
+      const diffLabel = document.getElementById('inspector-diff-metric');
+      if (dist < 15) {
+        diffLabel.innerText = 'Trùng khớp quang phổ: Mắt bạn thấy gần như không đổi';
+        diffLabel.className = 'text-[11px] text-emerald-400 font-medium';
+      } else if (dist < 80) {
+        diffLabel.innerText = 'Độ lệch vừa: Màu ngả tông xám/vàng đất';
+        diffLabel.className = 'text-[11px] text-amber-300 font-medium';
+      } else {
+        diffLabel.innerText = `Độ lệch lớn (\u0394E = ${dist.toFixed(0)}): Mất hẳn sắc đỏ/xanh gốc`;
+        diffLabel.className = 'text-[11px] text-cyan-300 font-medium';
+      }
+
+      // Step by step text
+      document.getElementById('math-step-1').innerHTML = `
+        R_lin = ${breakdown.rLin.toFixed(3)}<br>
+        G_lin = ${breakdown.gLin.toFixed(3)}<br>
+        B_lin = ${breakdown.bLin.toFixed(3)}
+      `;
+
+      document.getElementById('math-step-2').innerHTML = `
+        L = ${breakdown.L.toFixed(4)}<br>
+        M = ${breakdown.M.toFixed(4)}<br>
+        S = ${breakdown.S.toFixed(4)}
+      `;
+
+      document.getElementById('math-step-3').innerHTML = `
+        L' = ${breakdown.L_prime.toFixed(4)}<br>
+        M' = ${breakdown.M_prime.toFixed(4)}<br>
+        S' = ${breakdown.S_prime.toFixed(4)}
+      `;
+
+      document.getElementById('math-step-4').innerHTML = `
+        R' = ${breakdown.simR}<br>
+        G' = ${breakdown.simG}<br>
+        B' = ${breakdown.simB}
+      `;
+    }
+
+    /* ==========================================================================
+       5. TAB 2: PROCEDURAL HIGH-RES IMAGE GENERATORS & SLIDER ENGINE
+       ========================================================================== */
+
+    let currentPreset = 'traffic';
+    let currentViewMode = 'slider';
+    let sliderPercent = 50;
+    let customImageLoaded = null;
+
+    const SCENE_DESCRIPTIONS = {
+      traffic: {
+        title: 'Biển báo giao thông & Đèn tín hiệu đường phố',
+        text: 'Đèn đỏ (vốn có tín hiệu cảnh báo mạnh) sẽ bị mất sắc đỏ rực rỡ và chuyển sang tông màu vàng mù tạt / hổ phách tương tự đèn vàng. Đèn xanh lá cây chuyển sang sắc trắng xanh ngọc nhạt. Biển báo cấm (viền đỏ) mất đi tính nổi bật khẩn cấp.'
+      },
+      strawberry: {
+        title: 'Đĩa dâu tây / táo đỏ trên vòm lá xanh',
+        text: 'Hiện tượng ngụy trang sinh học nghịch đảo: Đối với mắt thường, quả dâu đỏ tươi nổi bật rực rỡ trên vòm lá xanh. Trong mắt người dùng (72% M + 28% L), cả dâu đỏ và lá xanh đều chuyển thành gam màu vàng nâu - ô liu xỉn, khiến quả dâu gần như "tàng hình" trong bụi cây!'
+      },
+      ishihara: {
+        title: 'Bảng chữ test ngụy trang (Camouflage & Ishihara Plate 74)',
+        text: 'Bảng test gồm các chấm tròn ngẫu nhiên. Người mắt thường đọc ngay ra số 74 màu đỏ cam trên nền xanh lá. Trong mắt người dùng, các chấm đỏ cam và xanh lá có cùng giá trị phản hồi nón suy giảm, khiến con số 74 hoàn toàn biến mất!'
+      },
+      meadow: {
+        title: 'Cánh đồng hoa rực rỡ nhiều màu sắc',
+        text: 'Bông hoa anh túc đỏ thắm biến thành màu vàng nâu, hoa oải hương màu tím biến thành màu xanh lam thuần khiết, thảm cỏ xanh non hòa vào màu đất. Thế giới rực rỡ 7 sắc cầu vồng thu hẹp lại chủ yếu chỉ còn 2 tông chủ đạo: Xanh lam và Vàng nâu.'
+      },
+      rainbow: {
+        title: 'Cầu vồng quang phổ 7 sắc (Atmospheric Rainbow Spectrum)',
+        text: 'Hiện tượng kinh điển của quang phổ học: Người bình thường thấy dải 7 sắc (Đỏ - Cam - Vàng - Lục - Lam - Chàm - Tím). Trong mắt người dùng (72% Deutan + 28% Protan), toàn bộ cầu vồng thu gọn lại chỉ còn 2 dải màu chính: Vàng nâu mù tạt ở nửa ngoài (Đỏ, Cam, Vàng, Lục) và Xanh lam ở nửa trong (Lam, Tím), phân tách nhau bởi một dải màu trắng xám nhờ nhờ (Điểm trung tính Neutral Point ~498nm).'
+      }
+    };
+
+    function loadPresetImage(presetId) {
+      currentPreset = presetId;
+      customImageLoaded = null;
+
+      ['traffic', 'strawberry', 'ishihara', 'meadow', 'rainbow'].forEach(p => {
+        const btn = document.getElementById(`btn-preset-${p}`);
+        if (p === presetId) {
+          btn.className = 'preset-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-cyan-400 bg-surface-800 border border-cyan-500/30';
+        } else {
+          btn.className = 'preset-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200';
+        }
+      });
+
+      const desc = SCENE_DESCRIPTIONS[presetId];
+      document.getElementById('scene-desc-title').innerText = desc.title;
+      document.getElementById('scene-desc-text').innerText = desc.text;
+
+      renderCurrentScene();
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      ['slider', 'side', 'toggle', 'heatmap'].forEach(m => {
+        const btn = document.getElementById(`btn-mode-${m}`);
+        if (m === mode) {
+          btn.className = 'viewmode-btn px-2.5 py-1 rounded-lg text-cyan-400 font-semibold bg-surface-800';
+        } else {
+          btn.className = 'viewmode-btn px-2.5 py-1 rounded-lg text-slate-400 hover:text-slate-200';
+        }
+      });
+
+      const sliderWrap = document.getElementById('slider-display-wrap');
+      const sideWrap = document.getElementById('side-display-wrap');
+      const heatWrap = document.getElementById('heatmap-display-wrap');
+
+      if (mode === 'slider' || mode === 'toggle') {
+        sliderWrap.classList.remove('hidden');
+        sideWrap.classList.add('hidden');
+        heatWrap.classList.add('hidden');
+        if (mode === 'toggle') {
+          // Toggle mode sets slider to either 0% or 100% on click
+          sliderPercent = 100;
+          updateSliderPosition();
+        }
+      } else if (mode === 'side') {
+        sliderWrap.classList.add('hidden');
+        sideWrap.classList.remove('hidden');
+        heatWrap.classList.add('hidden');
+      } else if (mode === 'heatmap') {
+        sliderWrap.classList.add('hidden');
+        sideWrap.classList.add('hidden');
+        heatWrap.classList.remove('hidden');
+      }
+
+      renderCurrentScene();
+    }
+
+    // Procedural Scene Painters
+    function drawProceduralScene(ctx, width, height, sceneType) {
+      if (sceneType === 'traffic') {
+        drawTrafficScene(ctx, width, height);
+      } else if (sceneType === 'strawberry') {
+        drawStrawberryScene(ctx, width, height);
+      } else if (sceneType === 'ishihara') {
+        drawIshiharaScene(ctx, width, height);
+      } else if (sceneType === 'meadow') {
+        drawMeadowScene(ctx, width, height);
+      } else if (sceneType === 'rainbow') {
+        drawRainbowScene(ctx, width, height);
+      }
+    }
+
+    function drawTrafficScene(ctx, w, h) {
+      // Night sky gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+      skyGrad.addColorStop(0, '#090e1a');
+      skyGrad.addColorStop(0.65, '#131b2e');
+      skyGrad.addColorStop(1, '#1e293b');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Distant city silhouette
+      ctx.fillStyle = '#0f172a';
+      for (let i = 0; i < w; i += 45) {
+        const bHeight = 60 + Math.sin(i * 0.05) * 40 + (i % 30) * 2;
+        ctx.fillRect(i, h * 0.65 - bHeight, 40, bHeight);
+      }
+
+      // Asphalt road
+      const roadGrad = ctx.createLinearGradient(0, h * 0.65, 0, h);
+      roadGrad.addColorStop(0, '#1c2230');
+      roadGrad.addColorStop(1, '#0b0f17');
+      ctx.fillStyle = roadGrad;
+      ctx.fillRect(0, h * 0.65, w, h * 0.35);
+
+      // Road markings (Yellow dashed line)
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 6;
+      ctx.setLineDash([30, 25]);
+      ctx.beginPath();
+      ctx.moveTo(w * 0.5, h * 0.65);
+      ctx.lineTo(w * 0.5, h);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Traffic Light Housing (Left-center)
+      const tlX = w * 0.28;
+      const tlY = h * 0.12;
+      const tlW = w * 0.13;
+      const tlH = h * 0.52;
+
+      // Pole
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(tlX + tlW * 0.45, tlY + tlH, tlW * 0.1, h - (tlY + tlH));
+
+      // Box
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(tlX, tlY, tlW, tlH, 16);
+      ctx.fill();
+      ctx.stroke();
+
+      const rLight = tlW * 0.3;
+      // 1. Red Light (TOP) - Lit brightly
+      const redY = tlY + tlH * 0.2;
+      const redGlow = ctx.createRadialGradient(tlX + tlW / 2, redY, 2, tlX + tlW / 2, redY, rLight * 2);
+      redGlow.addColorStop(0, '#ffffff');
+      redGlow.addColorStop(0.3, '#ef4444');
+      redGlow.addColorStop(0.8, 'rgba(239, 68, 68, 0.4)');
+      redGlow.addColorStop(1, 'rgba(239, 68, 68, 0)');
+      ctx.fillStyle = redGlow;
+      ctx.beginPath();
+      ctx.arc(tlX + tlW / 2, redY, rLight * 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(tlX + tlW / 2, redY, rLight, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Yellow Light (MIDDLE) - Dim
+      const yelY = tlY + tlH * 0.5;
+      ctx.fillStyle = '#713f12';
+      ctx.beginPath();
+      ctx.arc(tlX + tlW / 2, yelY, rLight, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. Green Light (BOTTOM) - Dim
+      const grnY = tlY + tlH * 0.8;
+      ctx.fillStyle = '#064e3b';
+      ctx.beginPath();
+      ctx.arc(tlX + tlW / 2, grnY, rLight, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Street Signs on the Right
+      // 1. Stop Sign (Red Octagon)
+      const stopX = w * 0.65;
+      const stopY = h * 0.28;
+      const stopR = w * 0.085;
+
+      ctx.fillStyle = '#dc2626';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      for (let a = 0; a < 8; a++) {
+        const ang = (a * Math.PI) / 4 + Math.PI / 8;
+        const px = stopX + stopR * Math.cos(ang);
+        const py = stopY + stopR * Math.sin(ang);
+        if (a === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `bold ${Math.round(stopR * 0.55)}px "Plus Jakarta Sans", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('STOP', stopX, stopY);
+
+      // 2. Green Highway Directional Sign
+      const signX = w * 0.55;
+      const signY = h * 0.48;
+      const signW = w * 0.36;
+      const signH = h * 0.22;
+
+      ctx.fillStyle = '#15803d';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(signX, signY, signW, signH, 12);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `bold ${Math.round(signH * 0.25)}px "Plus Jakarta Sans", sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.fillText('HÀ NỘI / CAO TỐC', signX + 20, signY + signH * 0.35);
+
+      ctx.font = `500 ${Math.round(signH * 0.18)}px "Plus Jakarta Sans", sans-serif`;
+      ctx.fillText('LỐI RA 500M  \u279C', signX + 20, signY + signH * 0.7);
+
+      // Tail lights reflection on wet road
+      const tailGlow = ctx.createRadialGradient(w * 0.5, h * 0.75, 5, w * 0.5, h * 0.75, w * 0.25);
+      tailGlow.addColorStop(0, 'rgba(239, 68, 68, 0.45)');
+      tailGlow.addColorStop(1, 'rgba(239, 68, 68, 0)');
+      ctx.fillStyle = tailGlow;
+      ctx.fillRect(w * 0.2, h * 0.65, w * 0.6, h * 0.35);
+    }
+
+    function drawStrawberryScene(ctx, w, h) {
+      // Wood textured table background
+      const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+      bgGrad.addColorStop(0, '#2e1c14');
+      bgGrad.addColorStop(1, '#1a100b');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Subtle table planks
+      ctx.strokeStyle = '#120b07';
+      ctx.lineWidth = 3;
+      for (let y = 0; y < h; y += 60) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+
+      // Large lush green leaves backdrop
+      const leafColors = ['#14532d', '#166534', '#15803d', '#22c55e'];
+      for (let i = 0; i < 18; i++) {
+        const lx = w * 0.15 + (i * 47) % (w * 0.7);
+        const ly = h * 0.2 + (i * 37) % (h * 0.6);
+        const lRad = 50 + (i % 5) * 15;
+
+        ctx.fillStyle = leafColors[i % leafColors.length];
+        ctx.beginPath();
+        ctx.ellipse(lx, ly, lRad, lRad * 0.55, (i * 0.4), 0, Math.PI * 2);
+        ctx.fill();
+
+        // Veins
+        ctx.strokeStyle = '#86efac';
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath();
+        ctx.moveTo(lx - lRad * 0.8, ly);
+        ctx.lineTo(lx + lRad * 0.8, ly);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
+      }
+
+      // Draw 6 Ripe Strawberries
+      const berries = [
+        { x: w * 0.35, y: h * 0.45, r: 52, rot: -0.2 },
+        { x: w * 0.55, y: h * 0.48, r: 56, rot: 0.15 },
+        { x: w * 0.45, y: h * 0.65, r: 60, rot: -0.05 },
+        { x: w * 0.25, y: h * 0.62, r: 48, rot: 0.3 },
+        { x: w * 0.68, y: h * 0.62, r: 50, rot: -0.25 },
+        { x: w * 0.48, y: h * 0.32, r: 46, rot: 0.1 }
+      ];
+
+      berries.forEach(b => {
+        ctx.save();
+        ctx.translate(b.x, b.y);
+        ctx.rotate(b.rot);
+
+        // Berry body (Heart / Cone shape)
+        const berryGrad = ctx.createRadialGradient(-b.r * 0.2, -b.r * 0.2, 5, 0, 0, b.r);
+        berryGrad.addColorStop(0, '#f87171');
+        berryGrad.addColorStop(0.3, '#ef4444');
+        berryGrad.addColorStop(0.8, '#dc2626');
+        berryGrad.addColorStop(1, '#991b1b');
+
+        ctx.fillStyle = berryGrad;
+        ctx.beginPath();
+        ctx.moveTo(0, b.r);
+        ctx.bezierCurveTo(b.r * 0.85, b.r * 0.2, b.r * 0.95, -b.r * 0.6, 0, -b.r * 0.7);
+        ctx.bezierCurveTo(-b.r * 0.95, -b.r * 0.6, -b.r * 0.85, b.r * 0.2, 0, b.r);
+        ctx.fill();
+
+        // Gloss highlight
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(-b.r * 0.3, -b.r * 0.35, b.r * 0.2, b.r * 0.1, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Yellow Achene Seeds
+        ctx.fillStyle = '#fef08a';
+        for (let row = -3; row <= 3; row++) {
+          for (let col = -3; col <= 3; col++) {
+            if (Math.abs(row) + Math.abs(col) <= 4) {
+              const sx = col * (b.r * 0.2) + (row % 2) * 5;
+              const sy = row * (b.r * 0.2);
+              ctx.beginPath();
+              ctx.ellipse(sx, sy, 2, 3.5, 0.2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+
+        // Green Calyx Leaves (Sepals on top)
+        ctx.fillStyle = '#22c55e';
+        for (let k = 0; k < 6; k++) {
+          const ang = (k * Math.PI) / 3 - Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(0, -b.r * 0.7);
+          ctx.lineTo(Math.cos(ang - 0.25) * b.r * 0.45, -b.r * 0.7 + Math.sin(ang - 0.25) * b.r * 0.45);
+          ctx.lineTo(Math.cos(ang) * b.r * 0.65, -b.r * 0.7 + Math.sin(ang) * b.r * 0.65);
+          ctx.lineTo(Math.cos(ang + 0.25) * b.r * 0.45, -b.r * 0.7 + Math.sin(ang + 0.25) * b.r * 0.45);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        ctx.restore();
+      });
+    }
+
+    function drawIshiharaScene(ctx, w, h) {
+      // Plate background
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(0, 0, w, h);
+
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+      const plateRadius = Math.min(w, h) * 0.42;
+
+      // Outer bezel
+      ctx.fillStyle = '#cbd5e1';
+      ctx.beginPath();
+      ctx.arc(cx, cy, plateRadius + 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#f1f5f9';
+      ctx.beginPath();
+      ctx.arc(cx, cy, plateRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pseudo-random dots generator with seeded distribution
+      // Number 74 pattern coordinates in normalized grid [-1, 1]
+      function isInside74(nx, ny) {
+        // Numeral '7' (Left side: nx between -0.55 and -0.05)
+        // Top bar
+        if (ny > -0.65 && ny < -0.45 && nx > -0.55 && nx < -0.1) return true;
+        // Slanted stem
+        const expectedX = -0.15 - (ny + 0.45) * 0.65;
+        if (ny >= -0.45 && ny <= 0.6 && Math.abs(nx - expectedX) < 0.13) return true;
+
+        // Numeral '4' (Right side: nx between 0.05 and 0.55)
+        // Right vertical stroke
+        if (nx > 0.28 && nx < 0.46 && ny > -0.6 && ny < 0.6) return true;
+        // Horizontal crossbar
+        if (ny > 0.12 && ny < 0.28 && nx > 0.05 && nx < 0.55) return true;
+        // Left diagonal stroke
+        const diagExpectedX = 0.32 - (ny + 0.6) * 0.45;
+        if (ny >= -0.6 && ny <= 0.2 && Math.abs(nx - diagExpectedX) < 0.12) return true;
+
+        return false;
+      }
+
+      const greenDotColors = ['#4ade80', '#22c55e', '#84cc16', '#a3e635', '#65a30d', '#15803d', '#bef264'];
+      const redOrangeDotColors = ['#ef4444', '#f97316', '#ea580c', '#dc2626', '#fb923c', '#e11d48', '#f43f5e'];
+
+      // Generate 1200 jittered dots
+      let seed = 42;
+      function random() {
+        seed = (seed * 9301 + 49297) % 233280;
+        return seed / 233280;
+      }
+
+      for (let i = 0; i < 1100; i++) {
+        const angle = random() * Math.PI * 2;
+        const dist = Math.sqrt(random()) * (plateRadius - 12);
+        const dotX = cx + dist * Math.cos(angle);
+        const dotY = cy + dist * Math.sin(angle);
+        const dotR = 4.5 + random() * 6.5;
+
+        const normX = (dotX - cx) / plateRadius;
+        const normY = (dotY - cy) / plateRadius;
+
+        const isDigit = isInside74(normX, normY);
+        const palette = isDigit ? redOrangeDotColors : greenDotColors;
+        const col = palette[Math.floor(random() * palette.length)];
+
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Title overlay on top
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 14px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Bảng thử sắc giác Ishihara Plate #74', cx, 28);
+    }
+
+    function drawMeadowScene(ctx, w, h) {
+      // Vivid Blue sky
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.55);
+      skyGrad.addColorStop(0, '#0284c7');
+      skyGrad.addColorStop(0.6, '#38bdf8');
+      skyGrad.addColorStop(1, '#bae6fd');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h * 0.55);
+
+      // Distant mountains
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.45);
+      ctx.lineTo(w * 0.3, h * 0.25);
+      ctx.lineTo(w * 0.6, h * 0.42);
+      ctx.lineTo(w * 0.85, h * 0.28);
+      ctx.lineTo(w, h * 0.4);
+      ctx.lineTo(w, h * 0.55);
+      ctx.lineTo(0, h * 0.55);
+      ctx.fill();
+
+      // Rolling Green Hills
+      const hillGrad = ctx.createLinearGradient(0, h * 0.4, 0, h);
+      hillGrad.addColorStop(0, '#16a34a');
+      hillGrad.addColorStop(0.5, '#15803d');
+      hillGrad.addColorStop(1, '#14532d');
+      ctx.fillStyle = hillGrad;
+
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.42);
+      ctx.bezierCurveTo(w * 0.35, h * 0.35, w * 0.65, h * 0.48, w, h * 0.4);
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.fill();
+
+      // Hundreds of wildflowers
+      const flowers = [
+        { color: '#dc2626', size: 7, count: 85, name: 'Red Poppy' },
+        { color: '#7c3aed', size: 6, count: 70, name: 'Purple Lavender' },
+        { color: '#eab308', size: 8, count: 75, name: 'Yellow Sunflower' },
+        { color: '#f97316', size: 6, count: 50, name: 'Orange Daisy' },
+        { color: '#f8fafc', size: 5, count: 60, name: 'White Blossom' }
+      ];
+
+      flowers.forEach(grp => {
+        ctx.fillStyle = grp.color;
+        for (let i = 0; i < grp.count; i++) {
+          const fx = ((i * 73 + grp.size * 37) % (w * 0.95)) + w * 0.025;
+          const progressY = (i * 31) % 100 / 100;
+          const fy = h * 0.45 + progressY * (h * 0.52);
+          const fSize = grp.size * (0.5 + progressY * 0.8);
+
+          ctx.beginPath();
+          ctx.arc(fx, fy, fSize, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+    }
+
+    function drawRainbowScene(ctx, w, h) {
+      // 1. Atmospheric Post-rain Sky Gradient
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.7);
+      skyGrad.addColorStop(0, '#1e293b'); // Storm clouds above
+      skyGrad.addColorStop(0.35, '#334155');
+      skyGrad.addColorStop(0.65, '#0284c7'); // Clearing blue sky
+      skyGrad.addColorStop(1, '#bae6fd'); // Misty golden-blue horizon
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h * 0.7);
+
+      // Sunbeams / Warm clearing light glow from top-left
+      const sunGlow = ctx.createRadialGradient(w * 0.1, h * 0.1, 10, w * 0.1, h * 0.1, w * 0.6);
+      sunGlow.addColorStop(0, 'rgba(254, 240, 138, 0.45)');
+      sunGlow.addColorStop(0.5, 'rgba(254, 240, 138, 0.12)');
+      sunGlow.addColorStop(1, 'rgba(254, 240, 138, 0)');
+      ctx.fillStyle = sunGlow;
+      ctx.fillRect(0, 0, w, h * 0.7);
+
+      // Rain clouds receding on the right
+      ctx.fillStyle = 'rgba(71, 85, 105, 0.4)';
+      ctx.beginPath();
+      ctx.arc(w * 0.85, h * 0.25, 90, 0, Math.PI * 2);
+      ctx.arc(w * 0.75, h * 0.32, 70, 0, Math.PI * 2);
+      ctx.arc(w * 0.95, h * 0.35, 80, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. The Luminous 7-Color Rainbow Arc
+      const arcCx = w * 0.5;
+      const arcCy = h * 0.92;
+      const baseR = h * 0.74;
+      const bandWidth = 11;
+
+      // 7 Optical Spectral Bands: Red, Orange, Yellow, Green, Cyan, Blue, Violet
+      const spectralBands = [
+        { color: '#ef4444', alpha: 0.84, name: 'Red (~650nm)' },
+        { color: '#f97316', alpha: 0.84, name: 'Orange (~600nm)' },
+        { color: '#facc15', alpha: 0.86, name: 'Yellow (~580nm)' },
+        { color: '#22c55e', alpha: 0.84, name: 'Green (~530nm)' },
+        { color: '#06b6d4', alpha: 0.84, name: 'Cyan (~490nm)' },
+        { color: '#2563eb', alpha: 0.86, name: 'Blue (~450nm)' },
+        { color: '#7c3aed', alpha: 0.84, name: 'Violet (~400nm)' }
+      ];
+
+      // Diffuse backdrop glow for rainbow
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(arcCx, arcCy, baseR + 8, Math.PI * 1.05, Math.PI * 1.95, false);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+      ctx.lineWidth = bandWidth * 8;
+      ctx.stroke();
+      ctx.restore();
+
+      // Draw the 7 distinct spectral arcs
+      spectralBands.forEach((band, idx) => {
+        const radius = baseR - idx * bandWidth;
+        ctx.save();
+        ctx.globalAlpha = band.alpha;
+        ctx.strokeStyle = band.color;
+        ctx.lineWidth = bandWidth + 1.5;
+        ctx.beginPath();
+        ctx.arc(arcCx, arcCy, radius, Math.PI * 1.08, Math.PI * 1.92, false);
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // 3. Mountains in background
+      ctx.fillStyle = '#475569';
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.58);
+      ctx.lineTo(w * 0.2, h * 0.45);
+      ctx.lineTo(w * 0.45, h * 0.56);
+      ctx.lineTo(w * 0.72, h * 0.42);
+      ctx.lineTo(w * 0.9, h * 0.52);
+      ctx.lineTo(w, h * 0.48);
+      ctx.lineTo(w, h * 0.68);
+      ctx.lineTo(0, h * 0.68);
+      ctx.fill();
+
+      // Green Hills
+      const hillGrad = ctx.createLinearGradient(0, h * 0.55, 0, h * 0.72);
+      hillGrad.addColorStop(0, '#16a34a');
+      hillGrad.addColorStop(0.6, '#15803d');
+      hillGrad.addColorStop(1, '#14532d');
+      ctx.fillStyle = hillGrad;
+
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.62);
+      ctx.bezierCurveTo(w * 0.28, h * 0.54, w * 0.68, h * 0.65, w, h * 0.58);
+      ctx.lineTo(w, h * 0.72);
+      ctx.lineTo(0, h * 0.72);
+      ctx.fill();
+
+      // 4. Serene Lake Surface (Reflection)
+      const lakeGrad = ctx.createLinearGradient(0, h * 0.68, 0, h);
+      lakeGrad.addColorStop(0, '#0369a1');
+      lakeGrad.addColorStop(0.4, '#0f172a');
+      lakeGrad.addColorStop(1, '#090d16');
+      ctx.fillStyle = lakeGrad;
+      ctx.fillRect(0, h * 0.68, w, h * 0.32);
+
+      // Mirrored Rainbow Reflection in water
+      spectralBands.forEach((band, idx) => {
+        const radius = (baseR - idx * bandWidth) * 0.92;
+        ctx.save();
+        ctx.globalAlpha = 0.24;
+        ctx.strokeStyle = band.color;
+        ctx.lineWidth = bandWidth * 0.8;
+        ctx.beginPath();
+        ctx.arc(arcCx, h * 0.68 - (arcCy - h * 0.68), radius, Math.PI * 0.08, Math.PI * 0.92, false);
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // Water ripples
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 1.5;
+      for (let y = h * 0.72; y < h; y += 14) {
+        ctx.beginPath();
+        const rx = (y * 37) % (w * 0.4) + w * 0.1;
+        const rw = 40 + ((y * 13) % 80);
+        ctx.moveTo(rx, y);
+        ctx.lineTo(rx + rw, y);
+        ctx.stroke();
+      }
+
+      // Title overlay on bottom-right of canvas
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText('Quang phổ Cầu vồng 7 sắc (380nm - 700nm)', w - 24, h - 18);
+    }
+
+    // Engine to render scenes and apply Machado LMS filter
+    function renderCurrentScene() {
+      const origCanvas = document.getElementById('canvas-original');
+      const simCanvas = document.getElementById('canvas-simulated');
+      const heatCanvas = document.getElementById('canvas-heatmap');
+
+      const width = 960;
+      const height = 540;
+
+      origCanvas.width = width;
+      origCanvas.height = height;
+      simCanvas.width = width;
+      simCanvas.height = height;
+      heatCanvas.width = width;
+      heatCanvas.height = height;
+
+      const origCtx = origCanvas.getContext('2d');
+      const simCtx = simCanvas.getContext('2d');
+      const heatCtx = heatCanvas.getContext('2d');
+
+      // 1. Draw Original Image
+      if (customImageLoaded) {
+        origCtx.drawImage(customImageLoaded, 0, 0, width, height);
+      } else {
+        drawProceduralScene(origCtx, width, height, currentPreset);
+      }
+
+      // 2. Pixel Processing with Machado LMS Matrix & Precomputed LUT
+      const t0 = performance.now();
+      const imgData = origCtx.getImageData(0, 0, width, height);
+      const data = imgData.data;
+
+      const simImgData = simCtx.createImageData(width, height);
+      const simData = simImgData.data;
+
+      const heatImgData = heatCtx.createImageData(width, height);
+      const heatData = heatImgData.data;
+
+      const m00 = currentMatrix[0][0], m01 = currentMatrix[0][1], m02 = currentMatrix[0][2];
+      const m10 = currentMatrix[1][0], m11 = currentMatrix[1][1], m12 = currentMatrix[1][2];
+      const m20 = currentMatrix[2][0], m21 = currentMatrix[2][1], m22 = currentMatrix[2][2];
+
+      const len = data.length;
+      for (let i = 0; i < len; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        const rLin = LUT_TO_LIN[r];
+        const gLin = LUT_TO_LIN[g];
+        const bLin = LUT_TO_LIN[b];
+
+        const rOutLin = m00 * rLin + m01 * gLin + m02 * bLin;
+        const gOutLin = m10 * rLin + m11 * gLin + m12 * bLin;
+        const bOutLin = m20 * rLin + m21 * gLin + m22 * bLin;
+
+        const simR = fastLinToSrgb(rOutLin);
+        const simG = fastLinToSrgb(gOutLin);
+        const simB = fastLinToSrgb(bOutLin);
+
+        simData[i] = simR;
+        simData[i + 1] = simG;
+        simData[i + 2] = simB;
+        simData[i + 3] = a;
+
+        // Color discrimination error for Heatmap
+        const rDiff = r - simR;
+        const gDiff = g - simG;
+        const bDiff = b - simB;
+        const loss = Math.min(255, Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff) * 1.8);
+
+        // Heatmap color: Blue (low loss) -> Yellow -> Red (high loss)
+        if (loss < 60) {
+          heatData[i] = 15;
+          heatData[i + 1] = Math.round(loss * 3);
+          heatData[i + 2] = 180;
+        } else if (loss < 140) {
+          heatData[i] = Math.round((loss - 60) * 3);
+          heatData[i + 1] = 220;
+          heatData[i + 2] = 20;
+        } else {
+          heatData[i] = 240;
+          heatData[i + 1] = Math.max(0, 255 - (loss - 140) * 2);
+          heatData[i + 2] = 20;
+        }
+        heatData[i + 3] = 255;
+      }
+
+      simCtx.putImageData(simImgData, 0, 0);
+      heatCtx.putImageData(heatImgData, 0, 0);
+
+      const t1 = performance.now();
+      document.getElementById('render-benchmark-pill').innerText = `Tốc độ Canvas: ${(t1 - t0).toFixed(1)} ms`;
+
+      // 3. Update Display Layers
+      updateDisplayLayers();
+    }
+
+    function updateDisplayLayers() {
+      const origCanvas = document.getElementById('canvas-original');
+      const simCanvas = document.getElementById('canvas-simulated');
+      const heatCanvas = document.getElementById('canvas-heatmap');
+
+      // Update Slider Viewport canvases
+      const dispOrig = document.getElementById('display-original-layer');
+      const dispSim = document.getElementById('display-simulated-layer');
+      dispOrig.width = origCanvas.width;
+      dispOrig.height = origCanvas.height;
+      dispSim.width = simCanvas.width;
+      dispSim.height = simCanvas.height;
+
+      dispOrig.getContext('2d').drawImage(origCanvas, 0, 0);
+      dispSim.getContext('2d').drawImage(simCanvas, 0, 0);
+
+      // Update Side by Side canvases
+      const sideOrig = document.getElementById('display-side-original');
+      const sideSim = document.getElementById('display-side-simulated');
+      sideOrig.width = origCanvas.width;
+      sideOrig.height = origCanvas.height;
+      sideSim.width = simCanvas.width;
+      sideSim.height = simCanvas.height;
+
+      sideOrig.getContext('2d').drawImage(origCanvas, 0, 0);
+      sideSim.getContext('2d').drawImage(simCanvas, 0, 0);
+
+      // Update Heatmap canvas
+      const heatDisp = document.getElementById('display-heatmap-layer');
+      heatDisp.width = heatCanvas.width;
+      heatDisp.height = heatCanvas.height;
+      heatDisp.getContext('2d').drawImage(heatCanvas, 0, 0);
+
+      updateSliderPosition();
+    }
+
+    function updateSliderPosition() {
+      const origLayer = document.getElementById('display-original-layer');
+      const divider = document.getElementById('slider-divider');
+
+      if (currentViewMode === 'toggle') {
+        if (divider) divider.style.display = 'none';
+        if (origLayer) {
+          origLayer.style.clipPath = sliderPercent >= 50 
+            ? 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' 
+            : 'polygon(0 0, 0 0, 0 100%, 0 100%)';
+        }
+      } else {
+        if (divider) {
+          divider.style.display = 'block';
+          divider.style.left = `${sliderPercent}%`;
+        }
+        if (origLayer) {
+          origLayer.style.clipPath = `polygon(0 0, ${sliderPercent}% 0, ${sliderPercent}% 100%, 0 100%)`;
+        }
+      }
+    }
+
+    // Draggable Slider & Toggle Interaction
+    const sliderWrap = document.getElementById('slider-display-wrap');
+    let isDragging = false;
+
+    function handleSliderMove(e) {
+      if (currentViewMode === 'toggle') return;
+      const rect = sliderWrap.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      let pct = ((clientX - rect.left) / rect.width) * 100;
+      pct = Math.max(0, Math.min(100, pct));
+      sliderPercent = pct;
+      updateSliderPosition();
+    }
+
+    sliderWrap.addEventListener('mousedown', (e) => {
+      if (currentViewMode === 'toggle') {
+        sliderPercent = sliderPercent >= 50 ? 0 : 100;
+        updateSliderPosition();
+        return;
+      }
+      isDragging = true;
+      handleSliderMove(e);
+    });
+
+    sliderWrap.addEventListener('touchstart', (e) => {
+      if (currentViewMode === 'toggle') {
+        sliderPercent = sliderPercent >= 50 ? 0 : 100;
+        updateSliderPosition();
+        return;
+      }
+      isDragging = true;
+      handleSliderMove(e);
+    }, { passive: true });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isDragging) handleSliderMove(e);
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (isDragging) handleSliderMove(e);
+    }, { passive: true });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    // Handle Custom Image Upload
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          customImageLoaded = img;
+          document.getElementById('scene-desc-title').innerText = `Ảnh tùy chọn: ${file.name}`;
+          document.getElementById('scene-desc-text').innerText = 'Ảnh đã được tải lên thành công và xử lý qua thuật toán mô phỏng không gian tế bào nón LMS.';
+          renderCurrentScene();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function downloadSimulatedCanvas() {
+      const simCanvas = document.getElementById('canvas-simulated');
+      const link = document.createElement('a');
+      link.download = `d15-simulated-${currentPreset}.png`;
+      link.href = simCanvas.toDataURL('image/png');
+      link.click();
+    }
+
+    /* ==========================================================================
+       6. TAB 3: REVERSE SIMULATOR (GÓC NHÌN NGƯỢC - CONFUSION ISOCLINES)
+       ========================================================================== */
+
+    let reverseTargetHex = '#DC2626';
+
+    const REVERSE_NARRATIVES = {
+      red: {
+        title: 'Khi bạn nhìn quả dâu đỏ tươi hoặc đèn đỏ giao thông:',
+        body: 'Trong mắt người bình thường, màu đỏ tươi mang năng lượng thị giác kích thích mạnh mẽ nhất. Nhưng với người dùng có 72% lỗi nón M và 28% lỗi nón L, sắc đỏ bị "lột bỏ" rực rỡ và chuyển thành màu vàng nâu / ô liu. Họ hoàn toàn không nhìn thấy quả dâu nổi bật trên cành cây, mà phải dựa vào <strong>độ bóng của vỏ dâu, hình dạng tam giác và sờ bằng tay</strong> để nhận biết.'
+      },
+      green: {
+        title: 'Khi bạn nhìn tán lá xanh hoặc đèn xanh giao thông:',
+        body: 'Màu xanh lục bị thiếu tế bào nón M kích thích, khiến nó mất đi sắc xanh tươi mát và ngả sang màu xám vàng hoặc trắng xanh nhạt. Khi đặt cạnh màu đỏ, cả hai cùng hội tụ về cùng một tọa độ màu sắc khiến họ hoàn toàn bất lực nếu chỉ dùng mắt để phân biệt.'
+      },
+      purple: {
+        title: 'Khi bạn nhìn hoa tím oải hương hoặc áo màu tím violet:',
+        body: 'Màu tím là sự tổng hợp giữa bước sóng đỏ và xanh lam. Do mắt người dùng bị suy giảm nặng thành phần đỏ, não bộ của họ chỉ nhận được tín hiệu xanh lam từ nón S (vốn đạt 0% lỗi). Vì vậy, họ sẽ khẳng định chiếc áo màu tím thực chất là <strong>màu xanh lam (Blue)</strong>.'
+      },
+      teal: {
+        title: 'Khi bạn nhìn màu xanh ngọc (Cyan / Teal):',
+        body: 'Xanh ngọc nằm ngay trên điểm trung tính (Neutral Point) của người Deutan. Điểm này kích thích nón L và M theo tỉ lệ tương đương với ánh sáng trắng. Kết quả là người dùng thấy màu xanh ngọc bích biến thành màu xám bạc hoặc trắng nhờ nhờ.'
+      }
+    };
+
+    function setReverseTargetColor(hex) {
+      reverseTargetHex = hex;
+      document.getElementById('reverse-picker').value = hex;
+      updateReverseConfusion();
+    }
+
+    function updateReverseConfusion() {
+      const origRgb = hexToRgb(reverseTargetHex);
+      const simRgb = simulateRGB(...origRgb);
+      const simHex = rgbToHex(...simRgb);
+
+      document.getElementById('reverse-target-swatch').style.backgroundColor = reverseTargetHex;
+      document.getElementById('reverse-target-hex').innerText = reverseTargetHex;
+      document.getElementById('reverse-target-rgb').innerText = `RGB: (${origRgb[0]}, ${origRgb[1]}, ${origRgb[2]})`;
+
+      document.getElementById('reverse-target-sim-swatch').style.backgroundColor = simHex;
+      document.getElementById('reverse-target-sim-hex').innerText = simHex;
+
+      // Mathematical Confusion Isocline Discovery:
+      // Along the confusion vector v_conf = [-0.9488, 0.3155, -0.0146] in linear RGB,
+      // shifting colors produces virtually identical simulated colors!
+      const linR = LUT_TO_LIN[origRgb[0]];
+      const linG = LUT_TO_LIN[origRgb[1]];
+      const linB = LUT_TO_LIN[origRgb[2]];
+
+      const offsets = [-0.15, -0.07, 0.08, 0.16];
+      const familyColors = [];
+
+      offsets.forEach((t, idx) => {
+        // Delta in linear RGB
+        const candR_lin = Math.max(0, Math.min(1, linR + t * -0.92));
+        const candG_lin = Math.max(0, Math.min(1, linG + t * 0.38));
+        const candB_lin = Math.max(0, Math.min(1, linB + t * -0.02));
+
+        const candR = fastLinToSrgb(candR_lin);
+        const candG = fastLinToSrgb(candG_lin);
+        const candB = fastLinToSrgb(candB_lin);
+
+        const candHex = rgbToHex(candR, candG, candB);
+        const candSimRgb = simulateRGB(candR, candG, candB);
+        const candSimHex = rgbToHex(...candSimRgb);
+
+        familyColors.push({
+          origHex: candHex,
+          simHex: candSimHex,
+          name: idx === 0 ? 'Xanh rêu ô-liu' : idx === 1 ? 'Nâu đất trầm' : idx === 2 ? 'Cam cháy' : 'Đỏ thẫm'
+        });
+      });
+
+      const familyContainer = document.getElementById('confused-family-container');
+      let familyHtml = '';
+
+      familyColors.forEach(item => {
+        familyHtml += `
+          <div class="bg-surface-900 rounded-xl p-3 border border-surface-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-300">${item.name}</span>
+              <span class="text-[10px] text-emerald-400 font-mono">Đồng sắc</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-12 h-12 rounded-lg color-swatch-ring shrink-0" style="background-color: ${item.origHex};" title="Mắt thường: ${item.origHex}"></div>
+              <div class="text-[10px] font-mono text-slate-400">
+                <div>Thường: <strong class="text-white">${item.origHex}</strong></div>
+                <div>Bạn thấy: <strong class="text-cyan-300">${item.simHex}</strong></div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      familyContainer.innerHTML = familyHtml;
+
+      // Update narrative
+      let narrative = REVERSE_NARRATIVES.red;
+      const [r, g, b] = origRgb;
+      if (g > r && g > b) narrative = REVERSE_NARRATIVES.green;
+      else if (b > r && b > g) narrative = REVERSE_NARRATIVES.teal;
+      else if (r > 120 && b > 120 && g < 100) narrative = REVERSE_NARRATIVES.purple;
+
+      document.getElementById('reverse-narrative-box').innerHTML = `
+        <h4 class="font-bold text-indigo-300 text-sm">${narrative.title}</h4>
+        <p class="text-slate-300 leading-relaxed">${narrative.body}</p>
+      `;
+    }
+
+    /* ==========================================================================
+       7. INITIALIZATION ON PAGE LOAD
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      drawD15Circle();
+      renderConfusionPalette();
+      onColorPickerChange('#E11D48');
+      updateReverseConfusion();
+      loadPresetImage('traffic');
+    });
+  </script>
+</body>
+</html>
